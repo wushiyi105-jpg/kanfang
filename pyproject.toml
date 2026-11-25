@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kanfang"
+version = "0.1.0"
+description = "看房 KanFang · 租房文案核查 Agent —— 拆费用、识话术、算真实月成本"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[project.scripts]
+kanfang = "kanfang.cli:main"
+
+[tool.setuptools]
+packages = ["kanfang"]
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

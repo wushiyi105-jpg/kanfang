@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import os
+import tempfile
 import unittest
 
 from kanfang import agent, mock, rules
+from kanfang.cli import read_text_file
 
 TEXT = ("望京 精装全配 一室一厅 45平 4500元/月 押一付三 中介费半个月 "
         "服务费300/月 水电燃气自理 随时看房 仅此一套 房东直租")
@@ -142,6 +145,54 @@ class TestOfflinePipeline(unittest.TestCase):
         out = mock.offline(item, contradiction)
         self.assertEqual(out["summary"], rules.local_summary(item, contradiction))
         self.assertEqual(out["extra_contradictions"], [])
+
+
+class TestFileEncoding(unittest.TestCase):
+    """issue #3:记事本另存的 GBK 文案要能读,带 BOM 的 UTF-8 要干净,坏文件要说人话。"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _write(self, name, data: bytes) -> str:
+        p = os.path.join(self.tmp.name, name)
+        with open(p, "wb") as f:
+            f.write(data)
+        return p
+
+    def test_gbk_file_is_readable(self):
+        p = self._write("gbk.txt", TEXT.encode("gbk"))
+        self.assertEqual(read_text_file(p), TEXT)
+
+    def test_utf8_bom_is_stripped(self):
+        p = self._write("bom.txt", TEXT.encode("utf-8-sig"))
+        self.assertEqual(read_text_file(p), TEXT)
+        self.assertFalse(read_text_file(p).startswith("\ufeff"))
+
+    def test_broken_file_exits_2(self):
+        p = self._write("bin.dat", b"\x00\x81\xfe\xff\x00garbage")
+        with self.assertExit(2):
+            read_text_file(p)
+
+    def test_missing_file_exits_2(self):
+        with self.assertExit(2):
+            read_text_file(os.path.join(self.tmp.name, "nope.txt"))
+
+    def assertExit(self, code):
+        test = self
+
+        class _Ctx:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                test.assertEqual(exc_type, SystemExit)
+                test.assertEqual(exc.code, code)
+                return True
+
+        return _Ctx()
 
 
 if __name__ == "__main__":

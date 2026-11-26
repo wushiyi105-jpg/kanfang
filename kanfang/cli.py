@@ -119,10 +119,24 @@ def render_history(rows: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def read_text_file(path: str) -> str:
+    """读文案文件:先按 utf-8-sig,失败回退 gb18030(兼容记事本 ANSI 另存)。"""
+    for enc in ("utf-8-sig", "gb18030"):
+        try:
+            with open(path, encoding=enc) as f:
+                return f.read()
+        except UnicodeDecodeError:
+            continue
+        except OSError as e:
+            print(f"❌ 读不到文件 {path}:{e.strerror}", file=sys.stderr)
+            sys.exit(2)
+    print(f"❌ 文件不是 UTF-8/GBK 编码,请另存为 UTF-8 后重试:{path}", file=sys.stderr)
+    sys.exit(2)
+
+
 def _get_text(args) -> str:
     if args.file:
-        with open(args.file, encoding="utf-8") as f:
-            return f.read()
+        return read_text_file(args.file)
     if args.text:
         return args.text
     if not sys.stdin.isatty():

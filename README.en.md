@@ -37,11 +37,34 @@ The first run creates `data/kanfang.db`; no pip install needed.
 
 > No API key ships with the project. `.env` is gitignored.
 
-Docker:
+Docker (the image is built and pushed to GHCR on every tag):
 
 ```bash
-docker build -t kanfang .
-docker run -p 8000:8000 kanfang
+docker pull ghcr.io/wushiyi105-jpg/kanfang:0.1.0
+docker run -p 8000:8000 ghcr.io/wushiyi105-jpg/kanfang:0.1.0
+```
+
+Build locally with `docker build -t kanfang . && docker run -p 8000:8000 kanfang`.
+
+## 🧪 Examples: run the real cases
+
+`examples/` holds 4 anonymised real listings; `examples/out/` holds the actual output produced on 2026-11-26 in offline mode, so it is reproducible.
+
+```bash
+python -m kanfang --mock scan --file examples/case-01.txt --city 北京 --budget 4000
+```
+
+Output (excerpt, verbatim Chinese output, full file at [`examples/out/case-01.md`](./examples/out/case-01.md)):
+
+```
+💰 费用表(本地复算)
+  · 月租:4500 元    ← 4500元/月
+  · 押金:4500 元    ← 押 1 个月
+  · 首期租金:13500 元    ← 押一付三
+  · 中介费:2250 元    ← 中介费半个月
+  · 服务费:300 元/月    ← 服务费300元/月
+  · 真实月成本:4988 元  (首年总额 ÷ 12,含一次性中介费)
+  · 首次支付:20250 元  (首期租金 + 押金 + 中介费)
 ```
 
 ## 🤔 Why not just ask a general LLM
@@ -172,8 +195,11 @@ kanfang/
 │   ├── talks.json        # 40 agent phrases
 │   ├── traps.json        # 15 contract traps
 │   └── rent_tiers.json   # rent ranges for 10 cities
-├── tests/test_kanfang.py # 22 offline tests
-├── assets/demo.gif
+├── examples/             # 4 anonymised listings + out/ actual reports
+├── tests/
+│   ├── test_kanfang.py       # 26 offline unit tests
+│   └── test_integration.py    # 10 integration tests (HTTP / fake model / CLI)
+├── assets/demo.gif       # 1080 px wide, 31 frames, 9.8 s
 ├── Dockerfile / .dockerignore
 └── README.md / README.en.md
 ```
@@ -184,7 +210,12 @@ kanfang/
 python -m unittest discover tests -v
 ```
 
-22 tests cover local rules only (fee parsing, formulas, phrases, contradictions, checklist, number guard, offline pipeline) and spend no tokens. CI runs the same suite on Python 3.10 / 3.11 / 3.12.
+36 tests in two layers:
+
+- **Unit (26)**: fee parsing, cost formulas, phrases, contradictions, checklist, number guard, offline pipeline — no tokens spent.
+- **Integration (10)**: a real `ThreadingHTTPServer` on a random port receiving `POST /api/scan` and asserting `monthly_cost=4988`, `first_payment=20250`, 15 clauses and a stored id; a fake OpenAI-compatible server feeding back a quote that is not in the source text and an invented 3800 offer, asserting the quote is dropped, the invented number is discarded and the local template takes over; `subprocess` CLI e2e asserting exit codes and stdout lines.
+
+CI runs the same suite on Python 3.10 / 3.11 / 3.12 and records coverage with codecov.
 
 ## 👤 Author
 

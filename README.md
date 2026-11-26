@@ -37,12 +37,48 @@ python -m kanfang scan --text "望京 精装全配 一室一厅 45平 4500元/�
 
 > 项目不自带任何 API key。`.env` 已 gitignore,不会提交。
 
-Docker 运行:
+Docker 运行(镜像由 CI 推到 GHCR,每次打 tag 自动构建):
 
 ```bash
-docker build -t kanfang .
-docker run -p 8000:8000 kanfang
+docker pull ghcr.io/wushiyi105-jpg/kanfang:0.1.0
+docker run -p 8000:8000 ghcr.io/wushiyi105-jpg/kanfang:0.1.0
 ```
+
+自己构建:`docker build -t kanfang . && docker run -p 8000:8000 kanfang`。
+
+## 🧪 示例:拿真实文案跑一遍
+
+`examples/` 里放了 4 份脱敏过的真实房源文案,`examples/out/` 是对应的实际输出(2026-11-26 跑出,离线模式,可复现)。
+
+```bash
+python -m kanfang --mock scan --file examples/case-01.txt --city 北京 --budget 4000
+```
+
+跑出来是这样(节选,完整见 [`examples/out/case-01.md`](./examples/out/case-01.md)):
+
+```
+💰 费用表(本地复算)
+  · 月租:4500 元    ← 4500元/月
+  · 押金:4500 元    ← 押 1 个月
+  · 首期租金:13500 元    ← 押一付三
+  · 中介费:2250 元    ← 中介费半个月
+  · 服务费:300 元/月    ← 服务费300元/月
+  · 真实月成本:4988 元  (首年总额 ÷ 12,含一次性中介费)
+  · 首次支付:20250 元  (首期租金 + 押金 + 中介费)
+
+⚠️  疑点(2)
+  1. [高] 身份与收费:写着「房东直租」却收中介费
+     原文:中介费半个月
+```
+
+| 文件 | 场景 | 关注点 |
+|---|---|---|
+| `case-01.txt` | 望京 45㎡ 一室一厅,中介费半个月 | 身份与收费矛盾、超预算 |
+| `case-02.txt` | 成都 合租主卧 18㎡,「无中介费」+ 服务费/物业 | 费用换名、合租边界 |
+| `case-03.txt` | 深圳 南山 两室一厅 68㎡,押二付一 | 首期支付、月度物业网费 |
+| `case-04.txt` | 上海 徐汇 一室户 32㎡,免中介费 + 服务费 | 折算单价、服务费占比 |
+
+四份输入都是纯文本,输出里每个数字都挂着原文片段,可以逐条回指核对。
 
 ## 🤔 为什么不用通用大模型直接问
 
@@ -172,8 +208,11 @@ kanfang/
 │   ├── talks.json        # 40 条中介话术
 │   ├── traps.json        # 15 条合同陷阱
 │   └── rent_tiers.json   # 10 城租金区间
-├── tests/test_kanfang.py # 22 个离线用例
-├── assets/demo.gif
+├── examples/             # 4 份脱敏文案 + out/ 实际输出
+├── tests/
+│   ├── test_kanfang.py       # 26 个离线用例(纯函数)
+│   └── test_integration.py    # 10 个集成用例(HTTP / 假模型 / CLI)
+├── assets/demo.gif       # 1080 宽,31 帧,9.8 秒
 ├── Dockerfile / .dockerignore
 └── README.md / README.en.md
 ```
@@ -184,7 +223,12 @@ kanfang/
 python -m unittest discover tests -v
 ```
 
-22 个用例只跑本地规则(费用解析、成本公式、话术、矛盾、清单、数字守卫、离线流水线),不花 token。CI 在 Python 3.10 / 3.11 / 3.12 上跑同一组测试。
+36 个用例分两层:
+
+- **纯函数(26)**:费用解析、成本公式、话术命中、矛盾检测、清单、数字守卫、离线流水线,不花 token。
+- **集成(10)**:真起 `ThreadingHTTPServer` 在随机端口发 `POST /api/scan`,断言 `monthly_cost=4988`、`first_payment=20250`、15 条条款与落库 id;起一个假的 OpenAI 兼容服务,喂回不在原文里的矛盾引用和编造的 3800 元报价,断言引用被丢弃、编造数字整句退回、全被退回时回落到本地模板;`subprocess` 跑 CLI,e2e 断言退出码与 stdout 关键行。
+
+CI 在 Python 3.10 / 3.11 / 3.12 上跑同一组测试,并用 codecov 记录覆盖率。
 
 ## 👤 作者
 

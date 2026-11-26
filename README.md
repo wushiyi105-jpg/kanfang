@@ -232,7 +232,7 @@ CI 在 Python 3.10 / 3.11 / 3.12 上跑同一组测试,并用 codecov 记录覆�
 
 ## 👤 作者
 
-shiyi · GitHub [@wushiyi105-jpg](https://github.com/wushiyi105-jpg) · [wushiyi105@gmail.com](mailto:wushiyi105@gmail.com)
+罗之之 · 15071889700
 
 ## 📄 License
 

@@ -219,7 +219,7 @@ CI runs the same suite on Python 3.10 / 3.11 / 3.12 and records coverage with co
 
 ## 👤 Author
 
-shiyi · GitHub [@wushiyi105-jpg](https://github.com/wushiyi105-jpg) · [wushiyi105@gmail.com](mailto:wushiyi105@gmail.com)
+Luo Zhizhi · 15071889700
 
 ## 📄 License
 

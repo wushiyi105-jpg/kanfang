@@ -199,7 +199,7 @@ kanfang/
 ├── tests/
 │   ├── test_kanfang.py       # 26 offline unit tests
 │   └── test_integration.py    # 10 integration tests (HTTP / fake model / CLI)
-├── assets/demo.gif       # 1080 px wide, 31 frames, 9.8 s
+├── assets/demo.gif       # 1080 px wide, 31 frames, 9.9 s
 ├── Dockerfile / .dockerignore
 └── README.md / README.en.md
 ```

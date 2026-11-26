@@ -212,7 +212,7 @@ kanfang/
 ├── tests/
 │   ├── test_kanfang.py       # 26 个离线用例(纯函数)
 │   └── test_integration.py    # 10 个集成用例(HTTP / 假模型 / CLI)
-├── assets/demo.gif       # 1080 宽,31 帧,9.8 秒
+├── assets/demo.gif       # 1080 宽,31 帧,9.9 秒
 ├── Dockerfile / .dockerignore
 └── README.md / README.en.md
 ```

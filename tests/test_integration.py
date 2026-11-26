@@ -184,9 +184,9 @@ class TestCLI(unittest.TestCase):
         self.assertIn("身份与收费", p.stdout)
 
     def test_scan_file_vector(self):
-        path = os.path.join(ROOT, "_tmp_case.txt")
-        with open(path, "w", encoding="utf-8") as f:
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as f:
             f.write(TEXT)
+            path = f.name
         try:
             p = self._run("--mock", "scan", "--file", path, "--city", "北京", "--budget", "4000")
         finally:

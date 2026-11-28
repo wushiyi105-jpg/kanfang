@@ -17,7 +17,7 @@ PAGE = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>看房 · 租房核查</title>
+<title>看房 · 首月要备多少</title>
 <style>
   :root {
     --bg:#f4f6fb; --card:#fff; --ink:#1f2937; --muted:#6b7280;
@@ -67,14 +67,72 @@ PAGE = """<!doctype html>
          font-size:14px; line-height:1.7; }
   details { margin-top:10px; font-size:14px; }
   details li { margin:4px 0; color:#374151; }
+
+.prod{display:block;font-size:11px;line-height:1.4;letter-spacing:.18em;font-weight:650;margin-bottom:8px;opacity:.72}
+.lede{max-width:62ch;line-height:1.75}
+.route{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin:0 0 20px;border:1px solid var(--line);background:var(--line)}
+.route span{padding:11px 13px;background:var(--card);font-size:12px;line-height:1.5}
+.route b{display:block;font-size:10px;letter-spacing:.1em;margin-bottom:3px;opacity:.66}
+button{min-height:46px}
+input,select{min-height:44px}
+@media(max-width:680px){
+  .wrap{padding:20px 16px 56px}
+  .route{grid-template-columns:1fr}
+  header h1{font-size:30px!important}
+  .row>div{min-width:100%!important}
+  button{width:100%}
+}
+
+body{background:#efece4;color:#17283b;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:950px}
+header{padding:8px 0 22px;border-bottom:2px solid #17283b;margin-bottom:22px}
+header h1{font-family:"Songti SC","SimSun",Georgia,serif;font-size:42px;line-height:1.22;letter-spacing:-.02em}
+header p{color:#626963;font-size:14px}
+.card{background:#fbfaf6;border:1px solid #d8d0c0;border-radius:2px;box-shadow:none}
+button{background:#17283b;border-radius:2px;letter-spacing:.06em}
+button:hover{background:#24415e}
+textarea,input,select{background:#fffdf8;border-color:#cfc5b4;border-radius:2px}
+textarea:focus,input:focus,select:focus{border-color:#17283b;box-shadow:0 0 0 2px #d9d2c4}
+.cost{grid-template-columns:1fr 1fr;gap:0;border-top:1px solid #b9ae9b;border-bottom:1px solid #b9ae9b}
+.cost .cell{border:0;border-right:1px solid #d8d0c0;border-radius:0;padding:16px 18px;background:transparent}
+.cost .cell:last-child{border-right:0}
+.cost .cell b{font-family:"Cascadia Mono",Consolas,monospace;font-size:30px;letter-spacing:-.03em}
+.item{border-left:3px solid #b06b32}
+h3{text-transform:none;letter-spacing:.06em;color:#3d4b52}
+
+
+/* palette-normalized */
+:root{--bg:#efece4;--card:#fbfaf6;--ink:#17283b;--text:#17283b;--dim:#626963;--line:#d8d0c0;--accent:#b06b32}
+
+/* polish-batch1 */
+button.ghost,button.secondary{background:transparent!important;color:#b06b32!important;border:1px solid #d8d0c0!important}
+
+/* mobile-32 */
+
+@media(max-width:760px){
+  main{grid-template-columns:1fr!important}
+  aside{border-right:0!important;border-bottom:1px solid #d8d0c0;width:auto!important}
+  section{padding:16px!important}
+  .row{flex-wrap:wrap!important}
+  .row>div{min-width:100%!important}
+  h1{font-size:30px!important}
+  .route{grid-template-columns:1fr!important}
+  button{min-height:48px}
+  pre{overflow-x:auto}
+}
+
+/* mobile-height */
+@media(max-width:760px){main{min-height:auto!important}aside{min-height:0!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>看房 · 租房核查<span class="badge" id="status-badge">…</span></h1>
-    <p>把中介发来的房源文案贴进来,先拆套路,再算真实月成本。</p>
+    <h1><span class="prod">看房</span>这两套房，首月各要备多少 <span class="badge" id="status-badge">…</span></h1>
+    <p class="lede">给近期要签租约的人：贴两段房源介绍，把押金、服务费、物业和一次性成本拆开。改租期，首月现金和摊到每月一起变。</p>
   </header>
+  <div class="route" aria-label="任务步骤"><span><b>01</b>贴两段房源</span><span><b>02</b>拆五项成本</span><span><b>03</b>带走看房问题单</span></div>
+
 
   <div class="card">
     <label>房源文案(原样贴,含费用和话术)</label>
